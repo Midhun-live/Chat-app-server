@@ -1,62 +1,75 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const mongoose = require("mongoose");
-const app = express();
 const cors = require("cors");
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");
 
 dotenv.config();
 
-// CORS middleware
+const app = express();
+
+// CORS middleware with multiple allowed origins and preflight support
 const allowedOrigins = [
-  "https://chat-app-rho-ten-58.vercel.app",
-  "http://localhost:3000", // Add localhost for local development
+  "https://chat-app-rho-ten-58.vercel.app", // Frontend URL
+  "http://localhost:3000", // Localhost for dev environment
 ];
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (allowedOrigins.includes(origin) || !origin) {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
-        callback(new Error('Not allowed by CORS'));
+        callback(new Error("Not allowed by CORS"));
       }
     },
     methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true,
+    credentials: true, // Enable credentials like cookies or tokens
   })
 );
 
-app.use(express.json());
+// Preflight request handling for all routes
+app.options("*", cors());
 
-// Import routes
-const userRoutes = require("./Routes/userRoutes");
-const chatRoutes = require("./Routes/chatRoutes");
-const messageRoutes = require("./Routes/messageRoutes");
+// Middleware to parse JSON body
+app.use(express.json());
 
 // MongoDB connection
 const connectDb = async () => {
   try {
     const connect = await mongoose.connect(process.env.MONGO_URI);
-    console.log("Server is Connected to Database");
+    console.log("Server is connected to the Database");
   } catch (err) {
-    console.log("Server is NOT connected to Database", err.message);
+    console.log("Error connecting to database", err.message);
   }
 };
 connectDb();
 
 app.get("/", (req, res) => {
-  res.send("API is running123");
+  res.send("API is running");
 });
+
+// Routes
+const userRoutes = require("./Routes/userRoutes");
+const chatRoutes = require("./Routes/chatRoutes");
+const messageRoutes = require("./Routes/messageRoutes");
 
 app.use("/user", userRoutes);
 app.use("/chat", chatRoutes);
 app.use("/message", messageRoutes);
 
-// Error Handling middlewares
+// Error Handling middleware
 app.use(notFound);
 app.use(errorHandler);
 
-// Start the server
-const PORT = process.env.PORT;
-app.listen(PORT, console.log(`Server is Running on port ${PORT}...`));
+// CORS debugging log (optional)
+app.use((req, res, next) => {
+  console.log("CORS headers are being applied...");
+  next();
+});
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}...`);
+});
