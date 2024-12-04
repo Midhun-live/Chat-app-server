@@ -5,22 +5,12 @@ const app = express();
 const cors = require("cors");
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");
 
-const allowedOrigins = [
-  "https://chat-app-rho-ten-58.vercel.app",
-];
-
 // CORS middleware
-app.use(cors({
-  origin: function (origin, callback) {
-    if (allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: "*",
+  })
+);
 dotenv.config();
 
 app.use(express.json());
