@@ -8,7 +8,7 @@ const { notFound, errorHandler } = require("./middleware/errorMiddleware");
 // CORS middleware
 app.use(
   cors({
-    origin: "*",
+    origin: "https://chat-app-rho-ten-58.vercel.app/",
   })
 );
 dotenv.config();
