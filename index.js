@@ -1,24 +1,40 @@
 const express = require("express");
 const dotenv = require("dotenv");
-const { default: mongoose } = require("mongoose");
+const mongoose = require("mongoose");
 const app = express();
 const cors = require("cors");
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");
 
+dotenv.config();
+
 // CORS middleware
+const allowedOrigins = [
+  "https://chat-app-rho-ten-58.vercel.app",
+  "http://localhost:3000", // Add localhost for local development
+];
+
 app.use(
   cors({
-    origin: "https://chat-app-rho-ten-58.vercel.app/",
+    origin: (origin, callback) => {
+      if (allowedOrigins.includes(origin) || !origin) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
   })
 );
-dotenv.config();
 
 app.use(express.json());
 
+// Import routes
 const userRoutes = require("./Routes/userRoutes");
 const chatRoutes = require("./Routes/chatRoutes");
 const messageRoutes = require("./Routes/messageRoutes");
 
+// MongoDB connection
 const connectDb = async () => {
   try {
     const connect = await mongoose.connect(process.env.MONGO_URI);
@@ -41,5 +57,6 @@ app.use("/message", messageRoutes);
 app.use(notFound);
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, console.log("Server is Running..."));
+// Start the server
+const PORT = process.env.PORT;
+app.listen(PORT, console.log(`Server is Running on port ${PORT}...`));
