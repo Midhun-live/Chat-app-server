@@ -7,7 +7,7 @@ const { notFound, errorHandler } = require("./middleware/errorMiddleware");
 
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: "https://your-frontend-domain.com",
   })
 );
 dotenv.config();
