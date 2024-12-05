@@ -11,6 +11,29 @@ const app = express();
 
 app.use(cors(corsOptions))
 
+// app.use(
+//   cors({
+//     origin: "*",
+//   })
+// );
+
+// const allowedOrigins = [
+//   "https://chat-app-rho-ten-58.vercel.app",
+//   "http://localhost:3000",
+// ];
+
+// // CORS middleware
+// app.use(cors({
+//   origin: function (origin, callback) {
+//     if (allowedOrigins.includes(origin)) {
+//       callback(null, true);
+//     } else {
+//       callback(new Error('Not allowed by CORS'));
+//     }
+//   },
+//   methods: ["GET", "POST", "PUT", "DELETE"],
+//   credentials: true
+// }));
 
 // Middleware to parse JSON body
 app.use(express.json());
