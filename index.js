@@ -1,36 +1,16 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const mongoose = require("mongoose");
-const cors = require("cors");
+const cors = require('cors')
+const corsOptions = require("./Config/corsOptions");
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");
 
 dotenv.config();
 
 const app = express();
 
-// CORS middleware with multiple allowed origins and preflight support
-const allowedOrigins = [
-  "https://chat-app-rho-ten-58.vercel.app", // Frontend URL
-  "http://localhost:3000", // Localhost for dev environment
-];
+app.use(cors(corsOptions))
 
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      // Allow requests with no origin (like mobile apps or curl requests)
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true, // Enable credentials like cookies or tokens
-  })
-);
-
-// Preflight request handling for all routes
-app.options("*", cors());
 
 // Middleware to parse JSON body
 app.use(express.json());
